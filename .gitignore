@@ -1,0 +1,26 @@
+# dependencies
+node_modules
+
+# Next.js
+.next
+out
+build
+
+# deployment
+.vercel
+
+# environment variables (keep the template)
+.env*
+!.env.example
+
+# logs
+*.log
+
+# local data
+data/inquiries.json
+data/*.tmp
+
+# local OS files
+.DS_Store
+*.pem
+*.tsbuildinfo
