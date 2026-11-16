@@ -1,5 +1,4 @@
 import fs from "fs";
-<<<<<<< HEAD
 import os from "os";
 import path from "path";
 import type { Inquiry } from "./types";
@@ -40,26 +39,6 @@ function write(items: Inquiry[]) {
       return;
     }
   }
-=======
-import path from "path";
-import type { Inquiry } from "./types";
-
-const file = path.join(process.cwd(), "data", "inquiries.json");
-
-function read(): Inquiry[] {
-  try {
-    const raw = fs.readFileSync(file, "utf8");
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as Inquiry[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function write(items: Inquiry[]) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(items, null, 2), "utf8");
->>>>>>> 29f8b522bc02bd1a600d5a8b081d0fe70cb767ea
 }
 
 let chain: Promise<unknown> = Promise.resolve();

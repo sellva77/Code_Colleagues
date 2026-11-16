@@ -4,7 +4,6 @@ import { sendInquiryEmail } from "@/lib/mail";
 import { validateInquiry } from "@/lib/validate";
 import { clientIp, formLimited } from "@/lib/request";
 
-<<<<<<< HEAD
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -21,9 +20,6 @@ export async function POST(request: Request) {
 }
 
 async function enroll(request: Request) {
-=======
-export async function POST(request: Request) {
->>>>>>> 29f8b522bc02bd1a600d5a8b081d0fe70cb767ea
   let body: Record<string, unknown>;
   try {
     body = (await request.json()) as Record<string, unknown>;
@@ -67,15 +63,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, emailed: true });
   } catch (error) {
     const message = error instanceof Error ? error.message.slice(0, 300) : "Email failed";
-<<<<<<< HEAD
     try {
       await updateInquiry(inquiry.id, { emailSent: false, emailError: message });
     } catch (saveError) {
       console.error("Could not record the email error:", saveError);
     }
-=======
-    await updateInquiry(inquiry.id, { emailSent: false, emailError: message });
->>>>>>> 29f8b522bc02bd1a600d5a8b081d0fe70cb767ea
     console.error("Inquiry saved but email failed:", message);
     const needsConfirm = /activat/i.test(message);
     return NextResponse.json(

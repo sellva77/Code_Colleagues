@@ -81,7 +81,6 @@ export function ContactForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, startedAt }),
       });
-<<<<<<< HEAD
       const raw = await response.text();
       let payload: { error?: string; ok?: boolean; emailed?: boolean } = {};
       try {
@@ -89,9 +88,6 @@ export function ContactForm() {
       } catch {
         payload = {};
       }
-=======
-      const payload = (await response.json()) as { error?: string; ok?: boolean; emailed?: boolean };
->>>>>>> 29f8b522bc02bd1a600d5a8b081d0fe70cb767ea
       if (!response.ok || !payload.emailed) {
         setError(payload.error || "We could not email your details. Please write to codecolleagues@gmail.com.");
         setPending(false);

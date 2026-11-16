@@ -139,16 +139,12 @@ async function sendViaFormInbox(inquiry: Inquiry, origin: string) {
     ...(inquiry.email ? { _replyto: inquiry.email } : {}),
   });
   const response = await postForm(`https://formsubmit.co/ajax/${encodeURIComponent(primary)}`, origin, body);
-<<<<<<< HEAD
   let payload: { success?: string | boolean; message?: string } = {};
   try {
     payload = JSON.parse(response.text || "{}") as { success?: string | boolean; message?: string };
   } catch {
     payload = { message: response.text.slice(0, 180) || "The enrollment email was not accepted." };
   }
-=======
-  const payload = JSON.parse(response.text || "{}") as { success?: string | boolean; message?: string };
->>>>>>> 29f8b522bc02bd1a600d5a8b081d0fe70cb767ea
   const accepted = payload.success === true || payload.success === "true";
   if (response.status < 200 || response.status >= 300 || !accepted) {
     throw new Error(payload.message || "The enrollment email was not accepted.");
