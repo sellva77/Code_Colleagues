@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { serviceOptions } from "@/lib/business";
+import { business, serviceOptions } from "@/lib/business";
 
 function NeedMenu() {
   const [value, setValue] = useState<string>(serviceOptions[0]);
@@ -63,6 +63,47 @@ function NeedMenu() {
   );
 }
 
+function fieldText(data: Record<string, FormDataEntryValue>, key: string) {
+  const value = data[key];
+  return typeof value === "string" ? value.trim() : "";
+}
+
+async function sendFromBrowser(data: Record<string, FormDataEntryValue>) {
+  const email = fieldText(data, "email");
+  const name = fieldText(data, "name");
+  const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(business.emailBusiness)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      Name: name,
+      Email: email || "—",
+      Phone: fieldText(data, "phone") || "—",
+      "Business name": fieldText(data, "company") || "—",
+      "What do you need": fieldText(data, "service"),
+      "About the project": fieldText(data, "message") || "(No message)",
+      _subject: `Enrollment from ${name}`,
+      _template: "table",
+      _captcha: "false",
+      _cc: business.emailPersonal,
+      ...(email ? { _replyto: email } : {}),
+    }),
+  });
+  const payload = (await response.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
+  const accepted = payload.success === true || payload.success === "true";
+  if (!response.ok || !accepted) {
+    const message = payload.message || "";
+    if (/activat/i.test(message)) {
+      throw new Error(
+        "Open codecolleagues@gmail.com, click the Activate link in the confirmation mail, then press Enroll again.",
+      );
+    }
+    throw new Error("We could not email your details. Please write to codecolleagues@gmail.com.");
+  }
+}
+
 export function ContactForm() {
   const [startedAt] = useState(() => Date.now());
   const [pending, setPending] = useState(false);
@@ -76,26 +117,42 @@ export function ContactForm() {
     const form = event.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
     try {
-      const response = await fetch("/api/inquiries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, startedAt }),
-      });
-      const raw = await response.text();
-      let payload: { error?: string; ok?: boolean; emailed?: boolean } = {};
+      let emailed = false;
+      let blocked = "";
       try {
-        payload = raw ? (JSON.parse(raw) as { error?: string; ok?: boolean; emailed?: boolean }) : {};
+        const response = await fetch("/api/inquiries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...data, startedAt }),
+        });
+        const raw = await response.text();
+        let payload: { error?: string; ok?: boolean; emailed?: boolean } = {};
+        try {
+          payload = raw ? (JSON.parse(raw) as { error?: string; ok?: boolean; emailed?: boolean }) : {};
+        } catch {
+          payload = {};
+        }
+        if (response.status === 400 || response.status === 429) {
+          blocked = payload.error || "Please check the form and try again.";
+        } else {
+          emailed = response.ok && payload.emailed === true;
+        }
       } catch {
-        payload = {};
+        emailed = false;
       }
-      if (!response.ok || !payload.emailed) {
-        setError(payload.error || "We could not email your details. Please write to codecolleagues@gmail.com.");
+      if (blocked) {
+        setError(blocked);
         setPending(false);
         return;
       }
+      if (!emailed) await sendFromBrowser(data);
       setDone(true);
-    } catch {
-      setError("We could not send that just now. Please call or email us.");
+    } catch (error) {
+      setError(
+        error instanceof Error && error.message
+          ? error.message
+          : "We could not send that just now. Please call or email us.",
+      );
       setPending(false);
     }
   }

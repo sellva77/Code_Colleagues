@@ -151,18 +151,26 @@ async function sendViaFormInbox(inquiry: Inquiry, origin: string) {
   }
 }
 
+async function sendViaSmtp(inquiry: Inquiry) {
+  const { user, mailer } = transporter();
+  await mailer.sendMail({
+    from: `"${process.env.MAIL_FROM_NAME || business.name}" <${user}>`,
+    to: recipientList(),
+    ...(inquiry.email ? { replyTo: inquiry.email } : {}),
+    subject: `New enrollment: ${inquiry.service} from ${inquiry.name}`,
+    text: inquiryText(inquiry),
+    html: inquiryHtml(inquiry),
+  });
+}
+
 export async function sendInquiryEmail(inquiry: Inquiry, origin = "http://localhost:3000") {
   if (mailConfigured()) {
-    const { user, mailer } = transporter();
-    await mailer.sendMail({
-      from: `"${process.env.MAIL_FROM_NAME || business.name}" <${user}>`,
-      to: recipientList(),
-      ...(inquiry.email ? { replyTo: inquiry.email } : {}),
-      subject: `New enrollment: ${inquiry.service} from ${inquiry.name}`,
-      text: inquiryText(inquiry),
-      html: inquiryHtml(inquiry),
-    });
-    return;
+    try {
+      await sendViaSmtp(inquiry);
+      return;
+    } catch (error) {
+      console.error("SMTP send failed, using the form inbox instead:", error);
+    }
   }
 
   await sendViaFormInbox(inquiry, origin);
