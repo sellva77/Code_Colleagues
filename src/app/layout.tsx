@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   description:
     "Code Colleagues is a freelance studio team. We build websites, mobile apps, and databases, then maintain them. AI and machine learning are part of the skill set. Delivered work includes PSB Travels, Ksp Transports, Banking Wallet, Library Arrangements, and visitor management for a large industry.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/logo.jpg" },
   applicationName: "Code Colleagues",
 };
 

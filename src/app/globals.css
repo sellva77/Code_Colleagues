@@ -154,10 +154,12 @@ section[id] { scroll-margin-top: 84px; }
 }
 .logo-mark { display: inline-flex; transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
 .logo:hover .logo-mark { transform: rotate(-8deg) scale(1.08); }
-.logo-mark path {
-  stroke-dasharray: 28;
-  stroke-dashoffset: 28;
-  animation: draw 1.05s 0.15s ease forwards;
+.logo-mark img {
+  width: 52px;
+  height: 52px;
+  display: block;
+  border-radius: 12px;
+  object-fit: cover;
 }
 .logo strong { display: block; font-size: 1.15rem; line-height: 1; letter-spacing: -0.03em; }
 .logo small {
@@ -1186,7 +1188,7 @@ html.motion [data-reveal].is-in {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .docket, .docket:hover { transform: none; animation: none; }
-  .orb, .icon-call svg, .icon-wa svg, .icon-call::after, .icon-wa::after, .logo-mark path, .rise > *, .docket li, .modal, .modal-back, .work-cue-text, .work-open, .work-open::after, .trust-line .icon-labeled, .trust-line .icon-labeled::after {
+  .orb, .icon-call svg, .icon-wa svg, .icon-call::after, .icon-wa::after, .logo-mark, .rise > *, .docket li, .modal, .modal-back, .work-cue-text, .work-open, .work-open::after, .trust-line .icon-labeled, .trust-line .icon-labeled::after {
     animation: none;
   }
   html.motion [data-reveal]:not(.is-in) { opacity: 1; transform: none; }
